@@ -1,21 +1,17 @@
-const app =require("express")()
+const app = require("express")();
 const dotenv = require("dotenv");
-
-
+const path = require("path");
 
 dotenv.config();
 const PORT1 = process.env.PORT1;
 
-const server = app.listen(
-  PORT1,
-  console.log(`Server running on PORT 4000...`)
-);
+const server = app.listen(4000, console.log(`Server running on PORT 4000...`));
 
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
     origin: "*",
-     credentials: true,
+    credentials: true,
   },
 });
 
@@ -50,3 +46,17 @@ io.on("connection", (socket) => {
     socket.leave(userData._id);
   });
 });
+
+const __dirname1 = path.resolve();
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname1, "/frontend/build")));
+
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(__dirname1, "frontend", "build", "index.html"))
+  );
+} else {
+  app.get("/", (req, res) => {
+    res.send("API is runningooo..");
+  });
+}
